@@ -8,11 +8,28 @@ export default function NewPostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    alert("저장되었습니다");
-    router.push("/posts");
+    if (title.trim() === "") {
+      alert("제목을 입력하세요");
+      return;
+    }
+    const newPost = {
+      id: Date.now(),
+      title: title.trim(),
+      body: content.trim(),
+      userId: 0,
+    };
+
+    try {
+      localStorage.setItem("newPost", JSON.stringify(newPost));
+      alert("저장되었습니다");
+      router.push("/posts");
+    } catch (e) {
+      console.error(e);
+      alert("저장 중 오류가 발생했습니다.");
+    }
   };
 
   return (
