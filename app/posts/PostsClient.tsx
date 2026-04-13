@@ -18,18 +18,37 @@ export default function PostsClient() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+        const res = await fetch("/api/posts");
         const data: Post[] = await res.json();
-        const sliced = data.slice(0, 20);
-        setPosts(sliced);
-        setFiltered(sliced);
+        setPosts(data);
+        setFiltered(data);
 
         const maybe = localStorage.getItem("newPost");
         if (maybe) {
           try {
             const newPost = JSON.parse(maybe) as Post;
-            setPosts((prev) => [newPost, ...prev]);
-            setFiltered((prev) => [newPost, ...prev]);
+            // Try to persist client-created post to local API, then merge
+            try {
+              const postRes = await fetch("/api/posts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  title: newPost.title,
+                  body: newPost.body,
+                  userId: newPost.userId,
+                }),
+              });
+              if (postRes.ok) {
+                const created = await postRes.json();
+                setPosts((prev) => [created, ...prev]);
+                setFiltered((prev) => [created, ...prev]);
+              }
+            } catch (e) {
+              // If persisting fails, fall back to showing it in-memory
+              setPosts((prev) => [newPost, ...prev]);
+              setFiltered((prev) => [newPost, ...prev]);
+            }
+
             localStorage.removeItem("newPost");
           } catch (e) {
             console.error("failed to parse newPost", e);

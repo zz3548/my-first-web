@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "React 19 새 기능 정리",
+    "body": "React 19에서 도입된 주요 변경사항과 예제를 정리합니다.",
+    "userId": "김코딩",
+    "date": "2026-03-30"
+  },
+  {
+    "id": 2,
+    "title": "Tailwind CSS 4 변경사항",
+    "body": "Tailwind CSS 4의 새로운 유틸리티와 마이그레이션 가이드를 정리합니다.",
+    "userId": "이디자인",
+    "date": "2026-03-28"
+  },
+  {
+    "id": 3,
+    "title": "Next.js 16 App Router 가이드",
+    "body": "Next.js 16 App Router 주요 개념과 예제를 다룹니다.",
+    "userId": "박개발",
+    "date": "2026-03-25"
+  }
+]
