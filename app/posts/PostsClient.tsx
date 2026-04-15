@@ -18,8 +18,17 @@ export default function PostsClient() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch("/api/posts");
-        const data: Post[] = await res.json();
+        // Fetch posts from JSONPlaceholder
+        const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+        const dataRaw = await res.json();
+        // JSONPlaceholder posts have `title`, `body`, `userId`, `id`
+        const data: Post[] = (dataRaw as any[]).map((p) => ({
+          id: Number(p.id),
+          title: String(p.title),
+          body: String(p.body ?? ""),
+          userId: p.userId ?? undefined,
+        }));
+
         setPosts(data);
         setFiltered(data);
 
