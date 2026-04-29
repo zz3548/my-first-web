@@ -3,7 +3,9 @@ import { readPosts, writePosts } from "@/lib/postsStore";
 
 // `context.params` may be a Promise in some Next.js typings, so handle both cases.
 export async function DELETE(_request: NextRequest, context: any) {
-  const params = await (context.params as Promise<{ id: string }> | { id: string });
+  const params = await (context.params as
+    | Promise<{ id: string }>
+    | { id: string });
   const id = Number((params as { id: string }).id);
   if (Number.isNaN(id)) {
     return NextResponse.json({ error: "invalid id" }, { status: 400 });
