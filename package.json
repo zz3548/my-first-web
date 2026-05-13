@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync:vercel:pull": "node ./scripts/sync-vercel-env.js pull --env production",
+    "sync:vercel:push": "node ./scripts/sync-vercel-env.js push --env production"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
