@@ -163,6 +163,21 @@ CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
   - Server Components에서 인증이 필요하면 서버에서 Supabase 클라이언트(서버 키 또는 서비스 역할 대신 세션 기반)를 사용해 SSR로 유저 컨텍스트를 확보
   - 클라이언트 상호작용(로그아웃, 로그인 폼)은 `use client` 컴포넌트로 구현
 
+- 추가 규칙 (Ch9)
+  - 보호 라우트 구현은 `middleware.ts`를 사용해 비로그인 사용자를 `/login`으로 리다이렉트합니다.
+  - Supabase 인증 호출은 `signInWithPassword`, `signUp`, `signOut`을 사용하고, 구버전 `auth.signIn()`을 사용하지 않습니다.
+  - 클라이언트 코드에 `service_role` 키를 두지 않습니다. 서버 전용 키는 서버 영역(환경변수 또는 서버-side config)에서만 사용하세요.
+
+### Ch9 Auth 요약
+
+- 인증 흐름: 회원가입(signup) → 로그인(login) → 포스트 작성/목록(posts)
+- Header 상태 분기:
+  - 비로그인: `로그인`, `회원가입` 링크 표시
+  - 로그인: `글쓰기`, `로그아웃` 버튼 표시
+- 보호 라우트 목록:
+  - `/posts/new` (작성 페이지)
+  - `/mypage` (마이페이지 및 하위 경로)
+
 ## 9. DB 스키마 (users/profiles, posts) — 예시
 
 아래는 간단한 SQL 스키마 예시(마이그레이션 파일에 반영 가능).
@@ -236,5 +251,11 @@ CREATE INDEX idx_posts_status_published_at ON posts(status, published_at DESC);
 - 로깅/모니터링: 서버 에러는 Sentry 같은 외부 서비스 연동 고려
 
 ---
+
+## Version Policy
+
+- 교재 기준: Next.js 16.2.1, @supabase/supabase-js 2.47.12, @supabase/ssr 0.5.2
+- 현재 설치 기준 (package.json): Next.js 16.2.1, @supabase/supabase-js 2.105.1, @supabase/ssr 0.10.2
+- 설명: 아키텍처 문서와 예제는 교재 기준으로 작성합니다. 빌드·런타임 문제는 `package.json`의 실제 설치 버전을 참고해 원인을 분석하세요.
 
 위 내용은 현재 코드베이스(컴포넌트/라우트/스타일 토큰)를 기준으로 작성했습니다. 원하시면 이 문서를 기반으로 `docs/DB_SCHEMA.md`와 `supabase/migrations/`의 SQL을 동기화해 드리겠습니다.

@@ -73,6 +73,21 @@
 - 타입 부정확성: TypeScript 타입을 생략하거나 `any`로 채우는 제안이 나올 수 있습니다. 항상 `props` 타입을 요구하세요.
 - 접근성(Accessibility) 누락: 이미지 `alt`, 버튼 `aria-*`, 키보드 접근성 등을 잊는 경우가 많습니다. 요청 시 접근성 요구사항을 명시하세요.
 
+## Ch9 Supabase Auth 관련 추가 규칙
+
+- 인증 방식은 이메일/비밀번호만 사용합니다. 소셜 로그인을 추가하지 마십시오.
+- Supabase 호출은 `signInWithPassword`, `signUp`, `signOut` 패턴을 사용합니다. 구버전 `auth.signIn()`을 사용하지 마세요.
+- 환경변수 이름은 교재 기준을 따릅니다: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- 클라이언트 코드에 `service_role` 또는 서버 전용 키를 절대 두지 마세요.
+- 보호 라우트는 `middleware.ts`를 사용하여 처리합니다(예: `/posts/new` 보호).
+- App Router 규칙을 반드시 지키세요: `next/router` 및 `pages/` 사용 금지.
+
+## Version Policy
+
+- 교재 기준: Next.js 16.2.1, @supabase/supabase-js 2.47.12, @supabase/ssr 0.5.2
+- 현재 설치 기준 (package.json): Next.js 16.2.1, @supabase/supabase-js 2.105.1, @supabase/ssr 0.10.2
+- 설명: 문서·수업 프롬프트와 예제는 교재 기준을 따릅니다. 실제 빌드·런타임 문제는 `package.json`의 버전을 우선 확인하세요. 버전 차이로 인한 빌드 오류가 있으면 해당 파일에 원인과 권장 대응(다운그레이드/업데이트)을 병기합니다.
+
 ## 코드를 요청할 때의 좋은 템플릿(초보자용)
 
 1. 목적: 무엇을 만들고 싶은지 한 줄로 설명
@@ -87,4 +102,3 @@
 "목적: 글 목록 카드 컴포넌트를 만듭니다. 위치: `components/PostCard.tsx`. Server Component. 입력: `{title: string, excerpt: string, date: string, tags: string[]}`. 제약: `Card` 컴포넌트(shadcn)를 사용하고 색상은 `var(--primary)`를 사용해 주세요. 접근성: 이미지에 alt 필수."
 
 ---
-
