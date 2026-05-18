@@ -82,6 +82,50 @@
 - 보호 라우트는 `middleware.ts`를 사용하여 처리합니다(예: `/posts/new` 보호).
 - App Router 규칙을 반드시 지키세요: `next/router` 및 `pages/` 사용 금지.
 
+## Ch10 posts CRUD 추가 규칙
+
+### 데이터 모델 (Ch8 기준 — 컬럼명 임의 변경 금지)
+
+**posts 테이블**
+
+- `id` uuid primary key
+- `user_id` uuid references profiles(id)
+- `title` text
+- `content` text
+- `created_at` timestamptz
+
+**profiles 테이블**
+
+- `id` uuid primary key, auth.users(id) 참조
+- `username` text
+- `avatar_url` text
+- `role` text
+
+**주의**: 위 컬럼명을 `authorId`, `body`, `users`, `author_id` 등으로 임의 변경하지 마세요.
+
+### Ch10 구현 규칙
+
+- `app/posts/page.tsx`는 Server Component로 유지하고, 서버에서 `posts`를 최신순 조회합니다.
+- `app/posts/new/page.tsx`와 `app/posts/[id]/page.tsx`는 필요한 경우에만 `"use client"`를 사용합니다.
+- `user_id`는 폼 입력값이나 URL 값으로 받지 말고, 인증 사용자 `user.id`를 서버/클라이언트 로직에서 자동 입력합니다.
+- 수정/삭제 UI는 `user.id === post.user_id` 조건으로만 표시하고, 실제 보안은 Ch11 RLS에서 처리합니다.
+- API 라우트는 `app/api/posts/route.ts`(GET/POST), `app/api/posts/[id]/route.ts`(GET/PUT/DELETE)에 둡니다.
+
+### CRUD 구현 기준
+
+- posts CRUD는 `lib/supabase/client.ts`의 Supabase 클라이언트를 사용합니다.
+- 현재 인증 사용자는 `useAuth()` 훅 (Ch9 `contexts/AuthContext.tsx`)으로 가져옵니다.
+- API 라우트는 다음과 같이 배치합니다:
+  - `app/api/posts/route.ts` — GET (전체/필터 조회), POST (새 포스트 생성)
+  - `app/api/posts/[id]/route.ts` — GET (상세 조회), PUT (수정, 작성자만), DELETE (삭제, 작성자만)
+- 페이지 라우트에서 호출:
+  - `app/posts/page.tsx` — 목록 (GET /api/posts)
+  - `app/posts/[id]/page.tsx` — 상세 (GET /api/posts/[id])
+  - `app/posts/new/page.tsx` — 새 글 작성 (POST /api/posts)
+- 수정/삭제 버튼은 **클라이언트에서 UX 목적으로만** 작성자만 표시합니다. 실제 권한 검증은 Ch11 Row Level Security (RLS)에서 구현합니다.
+- API 응답은 성공 시 200/201, 권한 오류 시 401/403, 기타 오류 시 적절한 HTTP 상태 코드를 사용하세요.
+- 새 포스트 생성 시, `user_id`는 클라이언트가 아닌 **서버(API 라우트)에서 현재 인증 사용자로부터 자동 입력**하세요.
+
 ## Version Policy
 
 - 교재 기준: Next.js 16.2.1, @supabase/supabase-js 2.47.12, @supabase/ssr 0.5.2

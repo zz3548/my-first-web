@@ -17,6 +17,7 @@ export async function signInWithEmail(email: string, password: string) {
 
 /**
  * 이메일/비밀번호로 회원가입합니다. 이름(name)은 user metadata에 저장합니다.
+ * 프로필도 profiles 테이블에 자동 생성됩니다.
  * 반환값은 Supabase의 응답을 그대로 전달합니다. 에러는 호출자가 처리하세요.
  */
 export async function signUpWithEmail(
@@ -31,6 +32,24 @@ export async function signUpWithEmail(
       data: name ? { name } : undefined,
     },
   });
+
+  // 회원가입 성공 시 profiles 테이블에 사용자 프로필 생성
+  if (res.data?.user?.id) {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .insert([
+        {
+          id: res.data.user.id,
+          username: name || email.split("@")[0],
+        },
+      ])
+      .single();
+
+    if (profileError) {
+      console.error("Failed to create profile:", profileError);
+      // 프로필 생성 실패해도 auth는 성공했으므로, 에러만 로그하고 계속 진행
+    }
+  }
 
   return res; // { data, error }
 }

@@ -1,74 +1,63 @@
-# TODO — Ch9 Supabase Auth 작업 정리
+# TODO — my-first-web (Ch10 기준: 2026-05-18 업데이트)
 
-다음 항목들은 Ch9 작업 범위에 따라 정리한 주요 체크리스트입니다. 로컬 빌드와 런타임 검증을 권장합니다.
+## 준비 단계 (Ch7~9) ✓ 완료
 
-- [x] 회원가입 구현 (`app/signup/page.tsx` — `signUpWithEmail`)
-- [x] 로그인 구현 (`app/login/page.tsx` — `signInWithEmail` / `signInWithPassword` 사용)
-- [x] 로그아웃 구현 (`signOut` 호출)
-- [x] Header 로그인 상태 분기 (`components/Header.tsx`)
-- [x] `/posts/new` 보호 (middleware.ts)
-- [ ] `npm run build` 검증 (TypeScript/빌드 에러 확인)
-- [ ] Vercel 배포 URL 및 환경변수 검증 (Preview/Production에 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` 등록)
+- [x] Next.js + TypeScript + Tailwind + shadcn/ui 초기화 (Ch7)
+- [x] 데이터베이스 스키마 설계 (Ch8 — profiles, posts 테이블)
+- [x] Supabase 환경변수 설정 (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
+- [x] 프로젝트 기본 레이아웃/헤더/홈 페이지 (Ch7)
+- [x] Supabase Auth (이메일/비밀번호) 구현 (Ch9 — lib/auth.ts, contexts/AuthContext.tsx)
+- [x] 로그인/회원가입/로그아웃 페이지 (Ch9)
+- [x] 보호 라우트 구현 (middleware.ts) (Ch9)
 
-권장 후속 작업:
+## Ch10: posts CRUD 구현 (진행 중)
 
-- 런타임 테스트: 회원가입 → 로그인 → 글 작성 흐름 검증
-- 미들웨어/쿠키 동기화 확인: 로그인 시 서버에서 읽을 수 있는 세션 쿠키가 설정되는지 확인
-- RLS 정책 검토: 작성자만 자신의 초안/글 편집 가능 여부
+### Read (조회) — 예정
 
-필요하면 이 TODO를 기반으로 CI 빌드 또는 QA 체크리스트를 추가해 드립니다.
-# TODO — my-first-web
+- [x] GET /api/posts — 모든 포스트 조회
+- [x] GET /api/posts/[id] — 상세 포스트 조회
+- [x] 홈페이지/포스트 목록 페이지에서 /api/posts 호출
+- [x] 상세 페이지에서 /api/posts/[id] 호출
 
-## 1단계: 기본 구조 (Ch7~8)
+### Create (생성) — 예정
 
-- [x] ARCHITECTURE.md 작성
+- [x] POST /api/posts 라우트 구현 (title, content, user_id)
+- [x] app/posts/new/page.tsx — 글 작성 폼
+- [x] 로그인 필수 확인 (useAuth() → 미인증 시 /login으로 리다이렉트)
 
-## 2단계: 핵심 기능 (Ch9~10)
+### Update (수정) — 예정
 
-- [x] 포스트 목록 페이지
+- [x] PUT /api/posts/[id] 라우트 구현
+- [x] app/posts/[id]/page.tsx 내 수정 폼/편집 모드 구현
+- [x] UX: 작성자만 "수정" 버튼 표시 (실제 권한 검증은 Ch11 RLS)
 
-## 3단계: 고급 기능 (Ch11~12)
+### Delete (삭제) — 예정
 
-- [ ] 마이페이지
+- [x] DELETE /api/posts/[id] 라우트 구현
+- [x] app/posts/[id] 상세 페이지에 "삭제" 버튼 (Dialog로 확인)
+- [x] UX: 작성자만 "삭제" 버튼 표시 (실제 권한 검증은 Ch11 RLS)
 
-## 진행률
+## 검증
 
-- 완료: 7 / 전체: 13 (약 54%)
+- [x] npm run build 통과
+- [x] 구버전 라우터/API grep 검증 통과
+- [x] 민감 키 grep 검증 통과
 
----
+## Ch11: 보안 강화 (이후)
 
-파일을 업데이트해야 하거나 항목을 옮기고 싶으면 알려주세요.
+- [ ] Row Level Security (RLS) 정책 작성
+  - 작성자만 자신의 포스트 수정/삭제 가능
+  - 공개 포스트는 모두 읽기 가능
+  - 미발행 포스트는 작성자만 읽기 가능
+- [ ] API 라우트에 user_id 검증 추가
 
-# TODO — my-first-web
+## Ch12 이상: 추가 기능
 
-## 1단계: 기본 구조 (Ch7~8)
-
-- [x] ARCHITECTURE.md 작성
-- [x] copilot-instructions.md 작성
-- [x] shadcn/ui 초기화 + 테마 설정
-- [x] 헤더/푸터 레이아웃
-- [x] 홈 페이지
-- [ ] Supabase 프로젝트 생성
-- [x] 데이터베이스 스키마 작성
-
-## 2단계: 핵심 기능 (Ch9~10)
-
-- [x] 포스트 목록 페이지
-- [x] 포스트 상세 페이지
-- [ ] 포스트 작성 (CRUD)
-- [ ] 로그인/회원가입
-- [ ] 회원가입/로그인/로그아웃 구현 (Supabase Auth)
-- [ ] `/posts/new` 보호 라우트 구현 (middleware.ts)
-
-## 3단계: 고급 기능 (Ch11~12)
-
-- [ ] 마이페이지
+- [ ] 마이페이지 (내 글 목록, 프로필)
 - [ ] 댓글 기능
-
-## 진행률
-
-- 완료: 8 / 전체: 13 (약 62%)
+- [ ] 태그/검색
+- [ ] 이미지 업로드 (Supabase Storage)
 
 ---
 
-파일을 업데이트해야 하거나 항목을 옮기고 싶으면 알려주세요.
+**진행률**: 14 / 14 = 100% (Ch10 구현 및 검증 완료)

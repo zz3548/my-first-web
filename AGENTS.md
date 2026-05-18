@@ -6,6 +6,15 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 <!-- END:nextjs-agent-rules -->
 
+## Ch10 posts CRUD 추가 지침
+
+- posts CRUD는 `lib/supabase/client.ts`의 Supabase 클라이언트를 사용합니다.
+- posts 테이블 스키마는 Ch8 `DB_SCHEMA.md`를 따릅니다: `id`, `user_id`, `title`, `content`, `created_at`
+- 인증은 `useAuth()` 훅 (Ch9 `contexts/AuthContext.tsx`)으로 현재 사용자를 가져옵니다.
+- API 라우트는 `app/api/posts/route.ts`(GET/POST), `app/api/posts/[id]/route.ts`(GET/PUT/DELETE)에 배치합니다.
+- 수정/삭제 UI(버튼 표시)는 작성자 확인으로만 구현하고, 실제 권한 검증은 Ch11 RLS에서 합니다.
+- App Router 규칙을 반드시 지키세요: `next/router` 및 `pages/` 사용 금지.
+
 ## Ch9 Auth 추가 지침
 
 - 여러 AI 에이전트를 사용할 때는 다음 규칙을 공통으로 따르세요:
@@ -18,6 +27,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Version Policy
 
-  - 교재 기준: Next.js 16.2.1, @supabase/supabase-js 2.47.12, @supabase/ssr 0.5.2
-  - 현재 설치 기준 (package.json): Next.js 16.2.1, @supabase/supabase-js 2.105.1, @supabase/ssr 0.10.2
-  - 설명: 에이전트는 문서·예제에서 교재 기준을 우선 사용합니다. 실제 빌드 오류가 발생하면 `package.json`의 버전을 근거로 원인을 진단·기록하세요.
+- 교재 기준: Next.js 16.2.1, @supabase/supabase-js 2.47.12, @supabase/ssr 0.5.2
+- 현재 설치 기준 (package.json): Next.js 16.2.1, @supabase/supabase-js 2.105.1, @supabase/ssr 0.10.2
+- 설명: 에이전트는 문서·예제에서 교재 기준을 우선 사용합니다. 실제 빌드 오류가 발생하면 `package.json`의 버전을 근거로 원인을 진단·기록하세요.

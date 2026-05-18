@@ -53,6 +53,12 @@ export default function Header() {
           >
             새 글 쓰기
           </Link>
+          <Link
+            href="/mypage"
+            className="rounded-full px-3 py-2 transition hover:bg-slate-200 hover:text-slate-900"
+          >
+            마이페이지
+          </Link>
           <button
             onClick={handleLogout}
             disabled={busy}
