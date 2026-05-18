@@ -81,6 +81,18 @@ export default function LoginPage() {
           {loading ? "로그인 중..." : "로그인"}
         </button>
       </form>
+
+      <div className="border-t border-slate-200 pt-6">
+        <p className="text-sm text-slate-600">
+          아직 계정이 없으신가요?{" "}
+          <a
+            href="/signup"
+            className="font-medium text-slate-900 hover:underline"
+          >
+            회원가입
+          </a>
+        </p>
+      </div>
     </section>
   );
 }

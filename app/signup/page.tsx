@@ -99,6 +99,18 @@ export default function SignupPage() {
           {loading ? "가입 중..." : "회원가입"}
         </button>
       </form>
+
+      <div className="border-t border-slate-200 pt-6">
+        <p className="text-sm text-slate-600">
+          이미 계정이 있으신가요?{" "}
+          <a
+            href="/login"
+            className="font-medium text-slate-900 hover:underline"
+          >
+            로그인
+          </a>
+        </p>
+      </div>
     </section>
   );
 }
