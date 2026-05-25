@@ -30,3 +30,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - 교재 기준: Next.js 16.2.1, @supabase/supabase-js 2.47.12, @supabase/ssr 0.5.2
 - 현재 설치 기준 (package.json): Next.js 16.2.1, @supabase/supabase-js 2.105.1, @supabase/ssr 0.10.2
 - 설명: 에이전트는 문서·예제에서 교재 기준을 우선 사용합니다. 실제 빌드 오류가 발생하면 `package.json`의 버전을 근거로 원인을 진단·기록하세요.
+
+## Ch11 RLS 주의사항
+
+- RLS 정책은 Supabase CLI 마이그레이션(`supabase/migrations/`)으로 관리해야 합니다. 콘솔에서 직접 실행한 SQL은 실험용으로만 사용하고, 배포용 정책은 마이그레이션에 포함하세요.
+- 정책 작성 시 `posts.user_id = auth.uid()` 비교를 기준으로 권한을 설계하세요. 클라이언트 UI 분기는 UX용이며 보안은 RLS가 담당합니다.
+- `service_role` 키는 절대 클라이언트에 넣지 마시고, 서버 전용 환경변수에서만 사용하세요.

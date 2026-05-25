@@ -101,41 +101,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "title이 필요합니다" }, { status: 400 });
   }
 
-  // 서비스 역할 클라이언트로 RLS 우회하여 삽입
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.warn("[POST /api/posts] SUPABASE_SERVICE_ROLE_KEY 없음");
-    return NextResponse.json(
-      {
-        error:
-          "서버 설정 오류. .env.local에 SUPABASE_SERVICE_ROLE_KEY를 추가하세요.",
-      },
-      { status: 500 },
-    );
-  }
-
-  const adminSupabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    { auth: { persistSession: false } },
+  // 서버 세션 클라이언트로 프로필 업서트 및 포스트 삽입
+  // (RLS가 user_id = auth.uid()를 요구하므로, 서버에서 명시적으로 user_id를 설정하면 허용됩니다)
+  const { error: profileUpsertError } = await supabase.from("profiles").upsert(
+    {
+      id: user.id,
+      username: user.email?.split("@")[0] || "user",
+      created_at: new Date().toISOString(),
+    },
+    { onConflict: "id" },
   );
-
-  // 프로필이 없으면 자동 생성 (upsert 사용)
-  const { error: profileUpsertError } = await adminSupabase
-    .from("profiles")
-    .upsert(
-      {
-        id: user.id,
-        username: user.email?.split("@")[0] || "user",
-        created_at: new Date().toISOString(),
-      },
-      { onConflict: "id" },
-    );
 
   if (profileUpsertError) {
     console.warn("[POST /api/posts] Profile upsert error:", profileUpsertError);
   }
 
-  const { data, error } = await adminSupabase
+  const { data, error } = await supabase
     .from("posts")
     .insert([
       {

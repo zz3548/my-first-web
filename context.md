@@ -115,4 +115,36 @@
 - 현재 설치 기준 (package.json): Next.js 16.2.1, @supabase/supabase-js 2.105.1, @supabase/ssr 0.10.2
 - 설명: 문서는 교재 기준으로 통일합니다. 실제 동작·빌드 오류가 버전 차이에서 발생하면 `package.json` 기준으로 원인을 진단하세요.
 
+## Ch11 Row Level Security (RLS) — 배포 규칙 요약
+
+- RLS 정책은 Supabase 콘솔에서 실험할 수 있으나, **배포용 정책은 반드시 Supabase CLI 마이그레이션 파일**로 관리해야 합니다. 마이그레이션 파일은 `supabase/migrations/`에 커밋하세요.
+- 적용 상태 (작업 중/권장):
+  - `posts` 테이블 RLS 활성화 및 정책: `supabase/migrations/20260520043651_add_posts_rls.sql` (또는 `supabase/policies/posts_rls.sql`) — `auth.uid()` 기준으로 동작하도록 설계합니다.
+  - `profiles` 테이블 관련 RLS 마이그레이션(권장/생성됨): `supabase/migrations/20260520090000_add_profiles_rls.sql` — 프로필 생성·수정을 인증 사용자 본인으로 제한할 경우 필요합니다.
+
+- 적용된(권장) `posts` 정책 개요:
+  - SELECT: 누구나 허용 (공개 포스트 조회)
+  - INSERT: 인증 사용자, `WITH CHECK (auth.uid() = user_id)` — 로그인한 본인이 user_id로 삽입해야 함
+  - UPDATE: `USING (auth.uid() = user_id) AND WITH CHECK (auth.uid() = user_id)` — 작성자만 수정
+  - DELETE: `USING (auth.uid() = user_id)` — 작성자만 삭제
+
+- 테스트 시나리오 (권장 수행 및 기대 동작):
+  - 비로그인(익명): GET `/api/posts` → 성공(SELECT 허용), POST/PUT/DELETE → 401/403 또는 RLS 차단
+  - 사용자 A (작성자): 로그인 → POST(자신의 `user_id`로 삽입) 성공, UPDATE/DELETE(자신 글) 성공
+  - 사용자 B (타인): 로그인 → POST(자신 글 삽입) 성공, UPDATE/DELETE(다른 사람 글) → RLS로 차단(권한없음)
+
+- 현재 관찰/권고사항:
+  - 브라우저(클라이언트)에서 프로필을 자동으로 생성(insert)하려 할 때 RLS로 차단되는 로그가 발견되었습니다. 이 경우 두 가지 대응이 있습니다:
+    1. `profiles` 테이블에 적절한 INSERT/UPDATE 정책을 추가(마이그레이션)하여 인증된 사용자가 자신의 프로필을 생성·수정할 수 있게 허용
+    2. 또는 프로필 생성 로직을 서버 신뢰 경로(API)로 옮기고 서버 세션 또는 service_role(서버 전용)로 upsert하여 처리(권장: 마이그레이션 방식으로 RLS를 보완)
+
+- 마이그레이션 적용 방법(요약):
+  1. `supabase/migrations/20260520043651_add_posts_rls.sql` 및 필요 시 `20260520090000_add_profiles_rls.sql`을 확인
+  2. 로컬에서 `npx supabase db push`로 마이그레이션을 적용
+  3. 클린 빌드: `.next` 삭제 후 `npm run build` 실행(이전 번들에 남아 있는 서비스-롤 키 하드코딩 흔적 제거)
+
+- 주의: `service_role` 키는 운영 중인 서버 전용 환경변수로만 사용하세요. 클라이언트에 절대 노출하지 마십시오.
+
+---
+
 원하시면 이 내용을 `README.md` 또는 프로젝트 문서(예: `docs/`)로 복사해 배포용 요약을 만들어 드리겠습니다.

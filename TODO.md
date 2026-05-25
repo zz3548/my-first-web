@@ -43,13 +43,30 @@
 - [x] 구버전 라우터/API grep 검증 통과
 - [x] 민감 키 grep 검증 통과
 
-## Ch11: 보안 강화 (이후)
+## Ch11: 보안 강화 (RLS) — 작업 지침
 
-- [ ] Row Level Security (RLS) 정책 작성
-  - 작성자만 자신의 포스트 수정/삭제 가능
-  - 공개 포스트는 모두 읽기 가능
-  - 미발행 포스트는 작성자만 읽기 가능
-- [ ] API 라우트에 user_id 검증 추가
+- RLS 정책은 **Supabase CLI 마이그레이션**으로 관리합니다. 직접 SQL Editor에서 영구 적용하지 마시고, 마이그레이션 파일을 `supabase/migrations/`에 추가하세요.
+- 정책 작성 시 기본 원칙:
+  - 수정/삭제 권한: `posts.user_id = auth.uid()` 조건으로 작성
+  - 읽기 권한: 공개 포스트는 모두 읽을 수 있게, 초안/비공개는 작성자만 읽을 수 있게 분리
+  - 프로필(선택사항): 프로필 수정은 본인만 허용하도록 `profiles.id = auth.uid()` 기반 정책 권장
+- RLS 적용 대상(우선순위): `posts` 테이블 (주 적용 대상). 필요 시 `profiles`에 대해서도 작성자 정책 추가.
+- `service_role` 키는 클라이언트에 절대 포함하지 마세요 — 서버 전용으로만 사용합니다.
+
+### Ch11 작업 체크리스트 (우선순위)
+
+- [ ] posts RLS 마이그레이션 생성 및 경로 확인 (`supabase/migrations/20260520043651_add_posts_rls.sql` 또는 `supabase/policies/posts_rls.sql`)
+- [ ] (필요 시) profiles RLS 마이그레이션 생성 (`supabase/migrations/20260520090000_add_profiles_rls.sql`)
+- [ ] 로컬에서 마이그레이션 적용: `npx supabase db push`
+- [ ] 다른 계정 우회 테스트: 사용자 A/B 시나리오로 INSERT/UPDATE/DELETE 권한 검증
+- [ ] 보안 키 노출 grep 및 결과 확인 (`git grep` / `Select-String`로 `SUPABASE_SERVICE_ROLE_KEY`, `service_role`, `PRIVATE_KEY` 등 검색)
+- [ ] 빌드/배포 검증: `.next` 정리 후 `npm run build`, 배포 시 환경변수 등록 및 RLS 동작 확인
+
+---
+
+참고: 마이그레이션 파일을 커밋한 뒤 `npx supabase db push`를 실행하고, 테스트(회원가입 → 프로필 upsert → 글 작성 시나리오)를 통해 RLS가 의도대로 동작하는지 확인하세요. 클라이언트에서 프로필을 직접 insert하려 할 때 RLS로 차단되는 경우가 발생하면 위 체크리스트의 profiles 마이그레이션 항목을 우선 처리하세요.
+
+- API 라우트: 서버에서 추가 검증을 하되, 실제 데이터 접근 제어는 RLS가 담당합니다(클라이언트/서버 검증은 방어적 코드용).
 
 ## Ch12 이상: 추가 기능
 

@@ -17,3 +17,9 @@
 - 교재 기준: Next.js 16.2.1, @supabase/supabase-js 2.47.12, @supabase/ssr 0.5.2
 - 현재 설치 기준 (package.json): Next.js 16.2.1, @supabase/supabase-js 2.105.1, @supabase/ssr 0.10.2
 - 설명: Claude로 생성하는 예제는 교재 기준을 따릅니다. 빌드·런타임 문제가 발생하면 `package.json`의 실제 버전을 우선 확인하세요.
+
+## Ch11 RLS 규정
+
+- RLS는 마이그레이션으로 관리해야 합니다(`supabase/migrations/`). 콘솔에서 직접 SQL을 실행해도 되지만, 배포 가능한 정책은 마이그레이션 파일로 남겨야 합니다.
+- 정책 작성을 할 때는 `posts.user_id`와 `auth.uid()` 비교를 우선으로 사용하세요. 클라이언트 UI 분기는 보안이 아니므로 RLS에 의존해야 합니다.
+- `service_role` 키는 클라이언트에 절대 포함하지 않습니다. 서버 전용으로만 사용하세요.

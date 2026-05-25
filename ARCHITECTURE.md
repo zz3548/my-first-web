@@ -306,6 +306,31 @@ CREATE INDEX idx_posts_status_published_at ON posts(status, published_at DESC);
 - 백업/마이그레이션: 마이그레이션 파일을 `supabase/migrations/`에 보관
 - 로깅/모니터링: 서버 에러는 Sentry 같은 외부 서비스 연동 고려
 
+## Ch11: Row Level Security (RLS) 적용 지침
+
+- RLS 정책은 프로젝트의 필수 보안 수단입니다. 정책은 Supabase CLI 마이그레이션으로 작성·관리하고 `supabase/migrations/`에 커밋하세요. 운영 중 콘솔에서 임시 테스트는 가능하지만, 배포용은 마이그레이션으로만 적용합니다.
+- 핵심 정책 기준: `posts.user_id`와 `auth.uid()` 비교를 통해 작성자 권한을 결정합니다. 읽기/수정/삭제 권한을 각 행 수준에서 제어하세요.
+- RLS 적용 우선 대상: `posts` 테이블(필수). 필요 시 `profiles` 테이블의 수정 권한도 `profiles.id = auth.uid()`로 제한하세요.
+- 클라이언트측 UI 분기는 사용자 경험 향상을 위한 것일 뿐, 보안이 아니므로 RLS에 의존해야 합니다.
+- `service_role` 키는 절대 클라이언트에 두지 마세요. 서비스 키는 서버 사이드 마이그레이션 또는 서버 API에서만 사용합니다.
+
+### 보안 계층(권장): UI(UX) vs DB(RLS)
+
+- UI 분기: `user.id === post.user_id` 같은 조건은 사용자 경험(버튼/메뉴 표시용)으로만 사용하세요. 클라이언트에서 조건만으로 권한을 신뢰하면 안 됩니다.
+- DB(RLS): 실제 권한 검증은 데이터베이스 수준에서 처리해야 합니다. RLS는 작성자 본인만 INSERT/UPDATE/DELETE 가능하도록 보장합니다.
+
+### 보호 정책(예시 목록)
+
+- `posts` 테이블
+  - `SELECT`: 공개 포스트는 누구나 조회 허용
+  - `INSERT`: `WITH CHECK (auth.uid() = user_id)` — 사용자가 자신의 user_id로 추가
+  - `UPDATE`: `USING (auth.uid() = user_id)` 및 `WITH CHECK (auth.uid() = user_id)` — 작성자만 수정
+  - `DELETE`: `USING (auth.uid() = user_id)` — 작성자만 삭제
+- `profiles` 테이블(선택적)
+  - `INSERT/UPDATE`: `WITH CHECK (auth.uid() = id)` — 인증된 사용자가 자신의 프로필만 생성/수정 가능
+
+적용 팁: 위 SQL 정책은 마이그레이션 파일(`supabase/migrations/`)로 남겨 버전관리하세요.
+
 ---
 
 ## Version Policy
