@@ -9,8 +9,8 @@ import Header from "@/components/Header";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "내 블로그",
-  description: "웹 개발을 배우며 기록하는 블로그",
+  title: "신지원의 블로그",
+  description: "내 일상을 공유하고 기록하는 공간입니다.",
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
           <nav className="border-b border-slate-200 bg-slate-100/90 backdrop-blur">
             <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-6 py-4">
               <Link href="/" className="text-lg font-bold tracking-tight">
-                내 블로그
+                신지원의 블로그
               </Link>
               {/* Header (client) handles auth-based links */}
               <div>
@@ -41,7 +41,7 @@ export default function RootLayout({
           </main>
 
           <footer className="border-t border-slate-200 bg-slate-50 py-4 text-center text-sm text-slate-500">
-            © 2026 내 블로그
+            © 2026 신지원의 블로그
           </footer>
         </AuthProvider>
       </body>

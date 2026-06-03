@@ -31,11 +31,14 @@ type Post = {
 export default function PostsClient() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filtered, setFiltered] = useState<Post[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [deleteTarget, setDeleteTarget] = useState<Post | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
+      setLoading(true);
       try {
         const res = await fetch("https://jsonplaceholder.typicode.com/posts");
         const dataRaw = await res.json();
@@ -83,6 +86,9 @@ export default function PostsClient() {
         }
       } catch (e) {
         console.error(e);
+        setError("게시글을 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -121,6 +127,35 @@ export default function PostsClient() {
       </div>
 
       <SearchBar onSearch={handleSearch} />
+
+      {loading && (
+        <div className="space-y-4">
+          <div className="animate-pulse h-8 w-40 rounded bg-slate-200" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="h-36 rounded-lg border bg-white p-4 shadow-sm"
+              >
+                <div className="h-5 w-3/4 rounded bg-slate-200 mb-3" />
+                <div className="h-3 w-full rounded bg-slate-200" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800 mb-4">
+          <p>{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && filtered.length === 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 mb-4">
+          <p>아직 게시글이 없습니다. 첫 글을 작성해보세요!</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.map((post) => (

@@ -26,20 +26,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
+    // 1) 빠르게 현재 세션 확인 (getSession은 비교적 덜 경합함)
     (async () => {
       try {
-        const { data } = await supabase.auth.getUser();
-        if (mounted) setUser(data?.user ?? null);
+        const sessionRes = await supabase.auth.getSession();
+        if (!mounted) return;
+        setUser(sessionRes.data?.session?.user ?? null);
+      } catch (e) {
+        // 로그는 남기되 치명적이지 않으므로 무시
+        console.debug("auth.getSession error (ignored):", e);
       } finally {
         if (mounted) setLoading(false);
       }
     })();
 
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) setUser(session.user);
-      else setUser(null);
+    // 2) 이후 auth 상태 변화 구독 (로그인/로그아웃 자동 반영)
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
     });
-
     const subscription = data?.subscription;
 
     return () => {
@@ -64,5 +68,3 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
-
-export default AuthContext;

@@ -42,20 +42,43 @@ export async function GET() {
     },
   );
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select("id, title, content, created_at, user_id")
-    .order("created_at", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("id, title, content, image_url, created_at, user_id")
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(data);
+  } catch (err: any) {
+    // Possible missing column (image_url) — retry without it
+    try {
+      const { data, error } = await supabase
+        .from("posts")
+        .select("id, title, content, created_at, user_id")
+        .order("created_at", { ascending: false });
+      if (error)
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      return NextResponse.json(data);
+    } catch (err2: any) {
+      return NextResponse.json({ error: String(err2) }, { status: 500 });
+    }
   }
-
-  return NextResponse.json(data);
 }
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
+
+  // 로그: 원본 쿠키 헤더(브라우저에서 쿠키가 전송되는지 확인)
+  try {
+    console.log(
+      "[POST /api/posts] request cookie header:",
+      request.headers.get("cookie"),
+    );
+  } catch (e) {
+    console.warn("[POST /api/posts] failed to read request.headers.cookie", e);
+  }
 
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -84,11 +107,33 @@ export async function POST(request: Request) {
     },
   );
 
+  // 로그: cookieStore에 저장된 주요 토큰 확인
+  try {
+    const sbToken = cookieStore.get("sb:token")?.value;
+    const sbAccess = cookieStore.get("sb-access-token")?.value;
+    console.log(
+      "[POST /api/posts] cookieStore tokens: sb:token=",
+      sbToken ? "(present)" : "(missing)",
+      "sb-access-token=",
+      sbAccess ? "(present)" : "(missing)",
+    );
+  } catch (e) {
+    console.warn("[POST /api/posts] failed to inspect cookieStore", e);
+  }
+
   // 현재 인증 사용자 확인
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
+
+  // 추가 로그: supabase 세션 정보 확인
+  try {
+    const sess = await supabase.auth.getSession();
+    console.log("[POST /api/posts] getSession result:", sess);
+  } catch (e) {
+    console.warn("[POST /api/posts] getSession failed:", e);
+  }
 
   console.log("[POST /api/posts] authError:", authError, "user id:", user?.id);
 
@@ -122,6 +167,7 @@ export async function POST(request: Request) {
       {
         title: String(body.title).trim(),
         content: body.content ? String(body.content).trim() : "",
+        image_url: body.image_url ?? null,
         user_id: user.id,
       },
     ])

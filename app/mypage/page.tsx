@@ -28,14 +28,9 @@ export default async function MyPage() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      // Use read-only cookie accessor here. Mutations must run in server actions/routes.
       cookies: {
         get: (name: string) => cookieStore.get(name)?.value,
-        set: (name: string, value: string, options?: any) => {
-          cookieStore.set(name, value, options);
-        },
-        remove: (name: string, options?: any) => {
-          cookieStore.delete(name);
-        },
       },
     },
   );

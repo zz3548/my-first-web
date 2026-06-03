@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signUpWithEmail } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/error-message";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -26,7 +27,8 @@ export default function SignupPage() {
       setLoading(false);
 
       if (res.error) {
-        setError(res.error.message || "회원가입에 실패했습니다.");
+        console.error("signup error:", res.error);
+        setError(getErrorMessage(res.error));
         return;
       }
 
@@ -34,7 +36,8 @@ export default function SignupPage() {
       setTimeout(() => router.push("/login"), 1200);
     } catch (err: any) {
       setLoading(false);
-      setError(err?.message || "회원가입 중 오류가 발생했습니다.");
+      console.error("signup exception:", err);
+      setError(getErrorMessage(err));
     }
   };
 

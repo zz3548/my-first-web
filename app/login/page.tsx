@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmail } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/error-message";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +24,8 @@ export default function LoginPage() {
       setLoading(false);
 
       if (res.error) {
-        setError(res.error.message || "로그인에 실패했습니다.");
+        console.error("login error:", res.error);
+        setError(getErrorMessage(res.error));
         return;
       }
 
@@ -31,7 +33,8 @@ export default function LoginPage() {
       router.push("/posts");
     } catch (err: any) {
       setLoading(false);
-      setError(err?.message || "로그인 중 오류가 발생했습니다.");
+      console.error("login exception:", err);
+      setError(getErrorMessage(err));
     }
   };
 
