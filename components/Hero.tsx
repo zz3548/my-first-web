@@ -5,6 +5,7 @@ import Link from "next/link";
 type Props = {
   title?: string;
   subtitle?: string;
+  image?: string | null;
 };
 
 export default function Hero({

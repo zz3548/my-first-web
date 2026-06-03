@@ -17,7 +17,7 @@ export async function GET(_req: NextRequest, context: Context) {
         set: (name: string, value: string, options?: any) =>
           cookieStore.set(name, value, options),
         remove: (name: string, options?: any) => cookieStore.delete(name),
-      },
+      } as any,
     },
   );
 
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest, context: Context) {
         set: (name: string, value: string, options?: any) =>
           cookieStore.set(name, value, options),
         remove: (name: string, options?: any) => cookieStore.delete(name),
-      },
+      } as any,
     },
   );
 

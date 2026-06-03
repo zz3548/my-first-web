@@ -28,7 +28,7 @@ export default async function Home() {
       {
         cookies: {
           get: (name: string) => cookieStore.get(name)?.value,
-        },
+        } as any,
       },
     );
 

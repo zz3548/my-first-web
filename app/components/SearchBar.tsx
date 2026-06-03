@@ -6,11 +6,13 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 type Props = {
   initialValue?: string;
   placeholder?: string;
+  onSearch?: (term: string) => void;
 };
 
 export default function SearchBar({
   initialValue = "",
   placeholder = "검색어를 입력하세요",
+  onSearch,
 }: Props) {
   const [term, setTerm] = useState(initialValue);
   const router = useRouter();
@@ -22,11 +24,17 @@ export default function SearchBar({
     // keep in sync if external navigation changed search param
     const q = searchParams?.get("q") || "";
     setTerm(q);
-  }, [searchParams]);
+    if (onSearch) {
+      onSearch(q);
+    }
+  }, [searchParams, onSearch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setTerm(v);
+    if (onSearch) {
+      onSearch(v);
+    }
     if (timer) window.clearTimeout(timer);
     const id = window.setTimeout(() => {
       const params = new URLSearchParams(searchParams?.toString() || "");

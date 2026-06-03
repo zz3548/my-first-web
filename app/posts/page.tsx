@@ -38,7 +38,7 @@ export default async function PostsPage({
         // Read-only cookie accessor in page render.
         cookies: {
           get: (name: string) => cookieStore.get(name)?.value,
-        },
+        } as any,
       },
     );
 

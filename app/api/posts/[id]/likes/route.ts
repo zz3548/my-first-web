@@ -25,7 +25,7 @@ export async function POST(_req: NextRequest, context: Context) {
         set: (name: string, value: string, options?: any) =>
           cookieStore.set(name, value, options),
         remove: (name: string, options?: any) => cookieStore.delete(name),
-      },
+      } as any,
     },
   );
 
@@ -94,7 +94,7 @@ export async function POST(_req: NextRequest, context: Context) {
 
   return NextResponse.json({
     liked: Array.isArray(check) && check.length > 0,
-    count: countData?._count?.id ?? (countData ? countData.length : 0),
+    count: (countData as any)?._count?.id ?? (countData ? countData.length : 0),
   });
 }
 
@@ -117,7 +117,7 @@ export async function GET(_req: NextRequest, context: Context) {
         set: (name: string, value: string, options?: any) =>
           cookieStore.set(name, value, options),
         remove: (name: string, options?: any) => cookieStore.delete(name),
-      },
+      } as any,
     },
   );
 
@@ -150,6 +150,6 @@ export async function GET(_req: NextRequest, context: Context) {
 
   return NextResponse.json({
     liked,
-    count: countData?._count?.id ?? (countData ? countData.length : 0),
+    count: (countData as any)?._count?.id ?? (countData ? countData.length : 0),
   });
 }

@@ -31,7 +31,7 @@ export default async function MyPage() {
       // Use read-only cookie accessor here. Mutations must run in server actions/routes.
       cookies: {
         get: (name: string) => cookieStore.get(name)?.value,
-      },
+      } as any,
     },
   );
 

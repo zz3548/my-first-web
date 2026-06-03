@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, notFound } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import supabase from "@/lib/supabase/client";
 import {
@@ -157,7 +157,7 @@ export default function PostDetailPage({ params }: PostPageProps) {
   // 수정/삭제 버튼은 UI 목적이며, 실제 보안은 Ch11 RLS에서 처리됩니다.
   const isAuthor = user && post && user.id === post.user_id;
 
-  const estimateReadTime = (text?: string) => {
+  const estimateReadTime = (text?: string | null) => {
     if (!text) return 1;
     const words = text.trim().split(/\s+/).length;
     return Math.max(1, Math.ceil(words / 200));
