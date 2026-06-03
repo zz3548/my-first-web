@@ -38,7 +38,7 @@ export async function GET() {
         remove: (name: string, options?: any) => {
           cookieStore.delete(name);
         },
-      },
+      } as any,
     },
   );
 
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
         remove: (name: string, options?: any) => {
           cookieStore.delete(name);
         },
-      },
+      } as any,
     },
   );
 

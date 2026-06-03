@@ -20,7 +20,7 @@ export async function GET(_request: NextRequest, context: PostRouteContext) {
         remove: (name: string, options?: any) => {
           cookieStore.delete(name);
         },
-      },
+      } as any,
     },
   );
 
@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest, context: PostRouteContext) {
         remove: (name: string, options?: any) => {
           cookieStore.delete(name);
         },
-      },
+      } as any,
     },
   );
 
@@ -130,7 +130,7 @@ export async function DELETE(_request: NextRequest, context: PostRouteContext) {
         remove: (name: string, options?: any) => {
           cookieStore.delete(name);
         },
-      },
+      } as any,
     },
   );
 
