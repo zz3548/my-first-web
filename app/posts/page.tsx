@@ -113,6 +113,9 @@ export default async function PostsPage({
 
       {posts.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <aside className="hidden md:block">
+            <Sidebar />
+          </aside>
           <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {posts.map((post) => (
               <Link key={post.id} href={`/posts/${post.id}`}>
@@ -140,9 +143,6 @@ export default async function PostsPage({
               </Link>
             ))}
           </div>
-          <aside className="hidden md:block">
-            <Sidebar />
-          </aside>
         </div>
       )}
     </section>

@@ -64,6 +64,10 @@ export default async function Home() {
         <Hero image={featured[0]?.image_url ?? null} />
 
         <div className="md:grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <Sidebar />
+          </div>
+
           <div className="md:col-span-2 space-y-6">
             <h2 className="text-2xl font-semibold">추천 글</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -78,10 +82,6 @@ export default async function Home() {
                 <PostCard key={p.id} post={p} />
               ))}
             </div>
-          </div>
-
-          <div className="md:col-span-1">
-            <Sidebar />
           </div>
         </div>
       </div>
