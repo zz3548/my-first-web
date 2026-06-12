@@ -53,6 +53,33 @@ export async function POST(_req: NextRequest, context: Context) {
     .eq("user_id", user.id)
     .limit(1);
 
+  // Ensure profile exists for this user (some signUp flows may skip profile creation)
+  try {
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", user.id)
+      .limit(1);
+    if (!prof || (Array.isArray(prof) && prof.length === 0)) {
+      console.log("[likes POST] creating missing profile for user", user.id);
+      const username = user.email
+        ? (user.email.split("@")[0] as string)
+        : "user";
+      const { error: pErr } = await supabase
+        .from("profiles")
+        .insert([
+          { id: user.id, username, created_at: new Date().toISOString() },
+        ]);
+      if (pErr)
+        console.warn(
+          "[likes POST] profile insert warning:",
+          pErr.message || pErr,
+        );
+    }
+  } catch (e) {
+    console.warn("[likes POST] profile existence check failed:", e);
+  }
+
   if (existing && existing.length > 0) {
     // unlike
     console.log("[likes POST] existing like found, deleting", existing);

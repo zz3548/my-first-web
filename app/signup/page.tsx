@@ -21,6 +21,11 @@ export default function SignupPage() {
     if (!name || !email || !password)
       return setError("모든 필드를 입력하세요.");
 
+    // 간단한 이메일 형식 체크
+    const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    if (!emailRe.test(email))
+      return setError("올바른 이메일 주소를 입력하세요.");
+
     try {
       setLoading(true);
       const res = await signUpWithEmail(email, password, name);

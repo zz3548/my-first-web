@@ -52,6 +52,29 @@ export function getErrorMessage(err: MaybeError): string {
     return "요청한 게시글을 찾을 수 없습니다.";
   }
 
+  // 로그인 관련
+  if (
+    raw.includes("invalid login credentials") ||
+    raw.includes("invalid email or password") ||
+    raw.includes("invalid credentials")
+  ) {
+    return "이메일 또는 비밀번호가 잘못되었습니다.";
+  }
+
+  // 잘못된 이메일 형식 응답
+  if (raw.includes("email address") && raw.includes("is invalid")) {
+    return "이메일 형식이 올바르지 않습니다.";
+  }
+
+  // 이메일 전송 레이트 리밋
+  if (
+    raw.includes("rate limit") ||
+    raw.includes("email rate limit") ||
+    raw.includes("email rate limit exceeded")
+  ) {
+    return "이메일 전송 제한에 도달했습니다. 잠시(몇 분) 후 다시 시도해주세요.";
+  }
+
   // fallback
   return "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
 }
